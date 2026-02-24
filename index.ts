@@ -5,6 +5,7 @@
  */
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
 // These .js files are not published on the repository, instead, just example artificial coordinate files are used.
+
 import { locations } from "./example-coordinates.js"
 
 async function initMap() {
@@ -35,7 +36,7 @@ async function initMap() {
     const label = labels[i % labels.length];
     const pinGlyph = new google.maps.marker.PinElement({
       // glyph: label,
-      glyph: "B",
+      glyph: "S",
       glyphColor: "red",
       background: "white",
       // glyphText: "some",
@@ -59,9 +60,10 @@ async function initMap() {
 
   // Add a marker clusterer to manage the markers.
   new MarkerClusterer({ markers, map, renderer: {
-    render: ({ count, position }) => {
+    render: ({ count, position }, stats ) => {
       return new google.maps.Marker({
-        label: { text: String(count), color: "red" },
+        label: { text: String(""), color: "transparent" },
+        opacity: count > stats.clusters.markers.mean ? 1 : 0.6,    
         position,
         // Customize icon here
       });
