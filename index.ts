@@ -58,8 +58,41 @@ async function initMap() {
     return marker;
   });
 
+const renderer = {
+  render: ({ count, position }, stats, map) => {
+    // 1. Calculate the average markers per cluster
+    // 'stats' provides clusters information in newer versions, 
+    // or we can calculate it from the clusterer instance.
+    // const clusters = clusterer.getClusters();
+    // const totalMarkers = clusters.reduce((sum, c) => sum + c.count, 0);
+    // const mean = totalMarkers / clusters.length;
+
+    // 2. Determine color based on the mean
+    const isAboveAverage = count > stats.clusters.markers.mean;
+    const color = isAboveAverage ? "#FF0000" : "#0000FF"; // Red if high, Blue if low
+    const size = isAboveAverage ? 50 : 40;
+
+    // 3. Create the SVG Icon
+    const svg = window.btoa(`
+      <svg fill="${color}" xmlns="http://www.w3.org" viewBox="0 0 24 24" width="50" height="50">
+        <circle cx="12" cy="12" r="10" />
+      </svg>`);
+
+    return new google.maps.Marker({
+      position,
+      icon: {
+        url: `data:image/svg+xml;base64,${svg}`,
+        scaledSize: new google.maps.Size(size, size),
+      },
+      label: { text: String(count), color: "white", fontSize: "12px" },
+      // Ensure high-count clusters sit on top visually
+      zIndex: Number(google.maps.Marker.MAX_ZINDEX) + count,
+    });
+  }
+};
+
   // Add a marker clusterer to manage the markers.
-  new MarkerClusterer({ markers, map });
+  new MarkerClusterer({ markers, map, renderer });
 }
 // Here were the original coordinates from google example
 
