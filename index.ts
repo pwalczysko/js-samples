@@ -34,6 +34,7 @@ async function initMap() {
   const markers = locations.map((position, i) => {
     const label = labels[i % labels.length];
     const pinGlyph = new google.maps.marker.PinElement({
+      // B for Bio-formats, S for server 
       glyph: "B",
       glyphColor: "red",
       background: "white",
@@ -57,20 +58,41 @@ const renderer = {
     const isAboveAverage = count >= stats.clusters.markers.mean;
     const color = isAboveAverage ? "#FF0000" : "#0000FF"; // Red if high, Blue if low
     const scale = isAboveAverage ? 1.1 : 1.05;
+    const opacity = isAboveAverage ? "0.7" : "0.6";
 
     const myPin = new PinElement({
       scale: scale,
       background: color,
       glyphColor: color,
     });
-    
-    
+
+    const svg = window.btoa(`
+    <svg fill="${color}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+      <circle cx="120" cy="120" opacity=".6" r="70" />
+      <circle cx="120" cy="120" opacity=".3" r="90" />
+      <circle cx="120" cy="120" opacity=".2" r="110" />
+      <circle cx="120" cy="120" opacity=".1" r="130" />
+    </svg>`);
+  
+    // ToDo: Rewrite this Marker as AdvancedMarkerElement
+     return new google.maps.Marker({
+       position,
+       icon: {
+         url: `data:image/svg+xml;base64,${svg}`,
+         scaledSize: new google.maps.Size(35, 35),
+       },
+       // adjust zIndex to be above other markers
+       zIndex: 1000 + count,
+       opacity: 0.75
+     });
+
     const myMarker = new AdvancedMarkerElement({
         position,
-        // opacity:
     });
 
+    myMarker.element.style.opacity = opacity;
     myMarker.append(myPin);
+
     return myMarker
   }
 };
