@@ -34,7 +34,7 @@ async function initMap() {
   const markers = locations.map((position, i) => {
     const label = labels[i % labels.length];
     const pinGlyph = new google.maps.marker.PinElement({
-      glyph: "B",
+      glyph: "S",
       glyphColor: "red",
       background: "white",
     })
@@ -57,20 +57,21 @@ const renderer = {
     const isAboveAverage = count >= stats.clusters.markers.mean;
     const color = isAboveAverage ? "#FF0000" : "#0000FF"; // Red if high, Blue if low
     const scale = isAboveAverage ? 1.1 : 1.05;
+    const opacity = isAboveAverage ? "1" : "0.6";
 
     const myPin = new PinElement({
       scale: scale,
       background: color,
       glyphColor: color,
     });
-    
-    
+
     const myMarker = new AdvancedMarkerElement({
         position,
-        // opacity:
     });
 
+    myMarker.element.style.opacity = opacity;
     myMarker.append(myPin);
+
     return myMarker
   }
 };
